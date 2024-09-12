@@ -351,7 +351,28 @@ sudo ufw enable  # This turns on the firewall with our new rules</code></pre>
   <p>And there you have it! Your server is now set up to serve your web application to the world. Remember, this guide uses PostgreSQL for the database, PM2 for process management, and Nginx as the web server because they're widely used and reliable, but there are many other great tools out there. As you get more comfortable with server management, feel free to explore alternatives that might better suit your specific needs.</p>
   <p>Don't worry if some of this seems complicated at first. It's normal to feel a bit overwhelmed when you're new to server management. Take it one step at a time, and don't be afraid to ask for help if you get stuck. You're doing great, and before you know it, you'll be a server pro!</p>
 
-  <h2>9. Pointing Your Domain to Your Server</h2>
+  <h2>9. Setting Up SSL with Let's Encrypt</h2>
+  <p>Before we point our domain to the server, let's set up SSL certification using Let's Encrypt. This will enable HTTPS for your website, making it more secure and trustworthy.</p>
+
+  <p>First, let's install Certbot, which is a tool that automates the process of getting and renewing Let's Encrypt SSL certificates:</p>
+
+  <pre><code class="language-bash">sudo apt install certbot python3-certbot-nginx -y</code></pre>
+
+  <p>Now, we can use Certbot to obtain an SSL certificate. Replace "your_domain.com" with your actual domain name:</p>
+
+  <pre><code class="language-bash">sudo certbot --nginx -d your_domain.com -d www.your_domain.com</code></pre>
+
+  <p>Follow the prompts. When asked if you want to redirect HTTP traffic to HTTPS, it's generally recommended to choose yes.</p>
+
+  <p>Certbot will automatically update your Nginx configuration to use the new SSL certificate. It will also set up a cron job to automatically renew the certificate before it expires.</p>
+
+  <p>You can test the automatic renewal process with:</p>
+
+  <pre><code class="language-bash">sudo certbot renew --dry-run</code></pre>
+
+  <p>If this command completes without any errors, you're all set! Your SSL certificate will automatically renew when needed.</p>
+
+  <h2>10. Pointing Your Domain to Your Server</h2>
   <p>Last step! Head over to your domain provider and add these records:</p>
   <ul>
     <li>An A record for your root domain, pointing to your server's IP</li>
