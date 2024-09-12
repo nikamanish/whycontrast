@@ -221,11 +221,11 @@ git config --global user.name "Your Name"
 git config --global user.email "your.email@example.com"</code></pre>
   <p>Great! Now let's pull in your repositories:</p>
   <pre><code class="language-bash">cd ~/code
-git clone https://github.com/your-username/frontend.git
-git clone https://github.com/your-username/backend.git</code></pre>
+git clone https://github.com/your-username/frontend-repo-name.git
+git clone https://github.com/your-username/backend-repo-name.git</code></pre>
 
   <h2>2. Setting Up Your Database</h2>
-  <p>You mentioned you're using PostgreSQL, so let's get that installed and create your database:</p>
+  <p>We're using PostgreSQL, so let's get that installed and create your database:</p>
   <pre><code class="language-bash">sudo apt install postgresql postgresql-contrib -y
 sudo -u postgres psql -c "CREATE DATABASE database;"</code></pre>
 
@@ -319,10 +319,10 @@ cd ~/code  # Navigate to your code directory</code></pre>
   <p>We're using Nginx because it's fast and reliable, but there are other web servers like Apache if you want to explore alternatives.</p>
   <p>Let's get Nginx set up:</p>
   <pre><code class="language-bash">sudo apt install nginx -y  # This installs Nginx on your server
-sudo nano /etc/nginx/sites-available/your_domain  # This creates a new configuration file for your site</code></pre>
+sudo nano /etc/nginx/sites-available/your_domain.com  # This creates a new configuration file for your site</code></pre>
   <p>Now, copy and paste this configuration into the file:</p>
   <pre><code class="language-nginx">server {
-    server_name website.com www.website.com;  # Replace with your actual domain name
+    server_name your_domain.com www.your_domain.com;  # Replace with your actual domain name
 
     location / {
         proxy_pass http://localhost:3000;  # This sends frontend requests to your frontend app
