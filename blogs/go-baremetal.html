@@ -31,7 +31,7 @@
   <meta property="og:image:width" content="2880"/>
   <meta property="og:image:height" content="1610"/>
 
-  <link rel="canonical" href="https://ycontrast.com/og.png/blogs/go-baremetal">
+  <link rel="canonical" href="https://ycontrast.com/blogs/go-baremetal">
 
   <style>
     :root {
@@ -220,7 +220,7 @@ git clone https://github.com/your-username/backend-repo-name.git</code></pre>
   <h2>2. Setting Up Your Database</h2>
   <p>We're using PostgreSQL, so let's get that installed and create your database:</p>
   <pre><code class="language-bash">sudo apt install postgresql postgresql-contrib -y
-sudo -u postgres psql -c "CREATE DATABASE database;"</code></pre>
+sudo -u postgres psql -c "CREATE DATABASE your_database_name;"</code></pre>
 
   <h2>3. Getting Node.js and Yarn Ready</h2>
   <p>Time to set up your JavaScript environment:</p>
@@ -336,7 +336,7 @@ sudo nano /etc/nginx/sites-available/your_domain.com  # This creates a new confi
     }
 }</code></pre>
   <p>Save the file and exit the editor. Now let's tell Nginx to use this configuration:</p>
-  <pre><code class="language-bash">sudo ln -s /etc/nginx/sites-available/your_domain /etc/nginx/sites-enabled/  # This enables your site configuration
+  <pre><code class="language-bash">sudo ln -s /etc/nginx/sites-available/your_domain.com /etc/nginx/sites-enabled/  # This enables your site configuration
 sudo nginx -t  # This tests your configuration for any errors
 sudo systemctl restart nginx  # This restarts Nginx to apply the changes</code></pre>
 
