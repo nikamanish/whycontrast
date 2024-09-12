@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Go Bare Metal: A Step-by-Step Guide | ycontrast</title>
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+
+  <meta name="description" content="A comprehensive step-by-step guide on setting up your web application on a bare metal server. Learn how to configure your server, install necessary software, and deploy your app.">
+
+  <meta name="keywords" content="bare metal server, web app setup, server configuration, Nginx, PM2, PostgreSQL, Node.js, Git, firewall configuration, domain setup">
+
+  <meta name="author" content="@nikamanish">
+
+  <meta property="og:title" content="Go Bare Metal: A Step-by-Step Guide | ycontrast">
+  <meta property="og:description" content="Learn how to set up your web application on a bare metal server with this comprehensive guide. Covers server access, software installation, and app deployment.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ycontrast.com/blogs/go-baremetal">
+  <meta property="og:image" content="https://ycontrast.com/og.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Go Bare Metal: A Step-by-Step Guide">
+  <meta name="twitter:description" content="Set up your web app on a bare metal server with our detailed guide. From server access to app deployment, we've got you covered.">
+  <meta name="twitter:image" content="https://ycontrast.com/og.png">
+  <meta name="twitter:creator" content="@nikamanish">
+
+  <meta property="og:image:width" content="2880"/>
+  <meta property="og:image:height" content="1610"/>
+
+  <link rel="canonical" href="https://ycontrast.com/og.png/blogs/go-baremetal">
+
+  <style>
+    :root {
+      --background: #1A1A1A;
+      --foreground: #666666;
+      --text-primary: #BBBBBB;
+      --text-secondary: #999999;
+      --text-tertiary: #777777;
+      --bg-primary: #151515;
+      --bg-secondary: #222222;
+      --bg-tertiary: #2A2A2A;
+      --border-color: rgba(255, 255, 255, 0.15);
+      --input-bg: rgba(255, 255, 255, 0.05);
+      --input-border: rgba(255, 255, 255, 0.1);
+      --input-text: #BBBBBB;
+      --input-placeholder: rgba(255, 255, 255, 0.3);
+      --button-bg: rgba(255, 255, 255, 0.05);
+      --button-hover-bg: rgba(255, 255, 255, 0.1);
+      --button-active-bg: rgba(255, 255, 255, 0.15);
+      --button-text: #BBBBBB;
+      --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+      --card-bg: #222222;
+      --card-shadow: rgba(255, 255, 255, 0.1);
+      --header-glow: rgba(255, 255, 255, 0.05);
+    }
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <!-- ... (previous head content remains unchanged) ... -->
+    <style>
+     :root {
+       /* ... (previous root variables remain unchanged) ... */
+     }
+
+    body {
+      font-family: "DM Sans", sans-serif;
+      background-color: var(--background);
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden; /* Prevent horizontal scrolling */
+    }
+
+    .container {
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        max-width: 1200px;
+        padding: 32px;
+      }
+    }
+
+    h1, h2 {
+      font-family: "DM Serif Display", serif;
+      color: var(--text-primary);
+      font-weight: 400;
+      word-wrap: break-word;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    h2 {
+      font-size: 1.75rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+    }
+
+    a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    a:hover {
+      color: var(--text-primary);
+    }
+
+    code {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.9rem;
+      border-radius: 12px;
+    }
+
+    p code {
+      background-color: var(--bg-tertiary);
+      padding: 0.2rem 0.4rem;
+      border-radius: 16px;
+      word-wrap: break-word;
+    }
+
+    pre {
+      /*white-space: pre-wrap;*/
+      /*word-wrap: break-word;*/
+      overflow-x: auto;
+    }
+
+    pre code {
+      display: block;
+      padding: 1rem;
+      border-radius: 12px;
+    }
+
+    ul, ol {
+      margin-bottom: 1.5rem;
+      padding-left: 2rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    blockquote {
+      border-left: 4px solid var(--foreground);
+      margin: 0 0 1.5rem;
+      padding-left: 1rem;
+      font-style: italic;
+      color: var(--text-secondary);
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--foreground);
+      margin: 2rem 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+      display: block;
+    }
+
+    th, td {
+      border: 1px solid var(--foreground);
+      padding: 0.5rem;
+      text-align: left;
+    }
+
+    th {
+      background-color: var(--bg-secondary);
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      .container {
+        padding: 12px;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+<div class="container">
+  <h1>Go Bare Metal: A Step-by-Step Guide</h1>
+  <p>Hey there! So you've rented a bare metal server and want to get your web app up and running? Let's walk through this process together, step by step. We'll cover everything from accessing your server to going live with your domain.</p>
+
+  <h2>1. Accessing Your Server and Setting Up the Basics</h2>
+  <p>First things first, let's get into that shiny new server of yours:</p>
+  <pre><code class="language-bash">ssh username@your_server_ip</code></pre>
+  <p>Now that we're in, let's get Git set up so we can grab your code:</p>
+  <pre><code class="language-bash">sudo apt update
+sudo apt install git -y
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"</code></pre>
+  <p>Great! Now let's pull in your repositories:</p>
+  <pre><code class="language-bash">cd ~/code
+git clone https://github.com/your-username/frontend.git
+git clone https://github.com/your-username/backend.git</code></pre>
+
+  <h2>2. Setting Up Your Database</h2>
+  <p>You mentioned you're using PostgreSQL, so let's get that installed and create your database:</p>
+  <pre><code class="language-bash">sudo apt install postgresql postgresql-contrib -y
+sudo -u postgres psql -c "CREATE DATABASE database;"</code></pre>
+
+  <h2>3. Getting Node.js and Yarn Ready</h2>
+  <p>Time to set up your JavaScript environment:</p>
+  <pre><code class="language-bash">curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+source ~/.bashrc
+nvm install 20
+nvm use 20
+npm install -g yarn</code></pre>
+
+  <h2>4. Setting Up Your Backend</h2>
+  <p>Let's get your backend ready to roll:</p>
+  <pre><code class="language-bash">cd ~/code/backend
+cp .env.example .env
+nano .env  # Don't forget to tweak those environment variables!
+yarn install</code></pre>
+
+  <h2>5. Preparing Your Frontend</h2>
+  <p>Now for the frontend:</p>
+  <pre><code class="language-bash">cd ~/code/frontend
+cp .env.example .env
+nano .env  # Again, adjust those variables as needed
+yarn install
+yarn build</code></pre>
+
+  <h2>6. Managing Your Processes with PM2</h2>
+  <p>Okay, now we're getting to the good stuff! You might be wondering, "What's PM2, and why do I need it?" Great question!</p>
+  <p>PM2 is like a super-nanny for your applications. When you run your app normally, it stops if you close your terminal or if it crashes. PM2 keeps your app running all the time, restarts it if it crashes, and can even help it handle more traffic as your site grows. It's super helpful, especially when you're just starting out and don't want to worry about your app stopping mysteriously.</p>
+  <p>We're using PM2 here because it's widely used and reliable, but there are other process managers out there if you prefer something else.</p>
+  <p>Let's set it up:</p>
+  <pre><code class="language-bash">npm install -g pm2  # This installs PM2 globally on your system
+cd ~/code  # Navigate to your code directory</code></pre>
+  <p>Now, we'll create a special file that tells PM2 how to run your apps. We call this an "ecosystem file":</p>
+  <pre><code class="language-bash">nano ecosystem.config.js  # This opens a text editor to create the file</code></pre>
+  <p>Copy and paste the following into the file:</p>
+  <pre><code class="language-javascript">module.exports = {
+  apps: [
+    {
+      name: 'backend',  // This is just a name to identify your backend app
+      cwd: '/root/code/backend',  // This is where your backend code lives
+      script: 'app.js',  // This is the main file of your backend app
+      watch: true,  // This tells PM2 to restart the app if any files change
+      env: {
+        NODE_ENV: 'production',  // This sets the environment to production mode
+        PORT: 3002  // This is the port your backend will use
+      }
+    },
+    {
+      name: 'frontend',  // A name for your frontend app
+      cwd: '/root/code/frontend',  // Where your frontend code lives
+      script: 'yarn',  // We're using yarn to start the frontend
+      args: 'start',  // This is the command to start your frontend
+      watch: true,  // Restart on file changes
+      env: {
+        NODE_ENV: 'production',  // Production mode
+        PORT: 3000  // The port for your frontend
+      }
+    }
+  ]
+};</code></pre>
+  <p>Save the file and exit the editor. Now, let's start your apps:</p>
+  <pre><code class="language-bash">pm2 start ecosystem.config.js  # This tells PM2 to start your apps based on the config file</code></pre>
+  <p>Don't worry if you see a lot of text output. If there are no red error messages, you're probably good to go!</p>
+
+  <h3>Additional PM2 Commands</h3>
+  <p>PM2 offers several useful commands for managing your applications:</p>
+
+  <h4>Restarting Applications</h4>
+  <p>To restart all applications:</p>
+  <pre><code class="language-bash">pm2 restart all</code></pre>
+  <p>To restart a specific application:</p>
+  <pre><code class="language-bash">pm2 restart app_name_or_id</code></pre>
+
+  <h4>Viewing Logs</h4>
+  <p>To view logs for all applications:</p>
+  <pre><code class="language-bash">pm2 logs</code></pre>
+  <p>To view logs for a specific application:</p>
+  <pre><code class="language-bash">pm2 logs app_name_or_id</code></pre>
+
+  <h4>Stopping Applications</h4>
+  <p>To stop all applications:</p>
+  <pre><code class="language-bash">pm2 stop all</code></pre>
+  <p>To stop a specific application:</p>
+  <pre><code class="language-bash">pm2 stop app_name_or_id</code></pre>
+
+  <p>These commands will help you manage your applications effectively. Remember, you can always use <code>pm2 --help</code> to see a full list of available commands.</p>
+
+  <h2>7. Setting Up Nginx as Your Web Server</h2>
+  <p>Next up is Nginx (pronounced "engine-x"). Think of Nginx as a friendly traffic cop for your website. When people try to visit your site, Nginx greets them and guides them to the right part of your application. It's called a "web server" and it's super important for running websites smoothly.</p>
+  <p>We're using Nginx because it's fast and reliable, but there are other web servers like Apache if you want to explore alternatives.</p>
+  <p>Let's get Nginx set up:</p>
+  <pre><code class="language-bash">sudo apt install nginx -y  # This installs Nginx on your server
+sudo nano /etc/nginx/sites-available/your_domain  # This creates a new configuration file for your site</code></pre>
+  <p>Now, copy and paste this configuration into the file:</p>
+  <pre><code class="language-nginx">server {
+    server_name website.com www.website.com;  # Replace with your actual domain name
+
+    location / {
+        proxy_pass http://localhost:3000;  # This sends frontend requests to your frontend app
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    location /api {
+        proxy_pass http://localhost:3002;  # This sends API requests to your backend app
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}</code></pre>
+  <p>Save the file and exit the editor. Now let's tell Nginx to use this configuration:</p>
+  <pre><code class="language-bash">sudo ln -s /etc/nginx/sites-available/your_domain /etc/nginx/sites-enabled/  # This enables your site configuration
+sudo nginx -t  # This tests your configuration for any errors
+sudo systemctl restart nginx  # This restarts Nginx to apply the changes</code></pre>
+
+  <h2>8. Opening Up Your Firewall</h2>
+  <p>Last but not least, we need to configure your firewall. A firewall is like a security guard for your server. By default, it doesn't let any traffic through, which is safe but not very useful for a web server! We need to tell it to allow web traffic.</p>
+  <p>We'll use a tool called UFW (Uncomplicated Firewall) to do this. It's already installed on most Ubuntu systems, which is convenient.</p>
+  <p>Here's what we'll do:</p>
+  <pre><code class="language-bash">sudo ufw allow 80  # This allows regular web traffic (HTTP)
+sudo ufw allow 443  # This allows secure web traffic (HTTPS)
+sudo ufw enable  # This turns on the firewall with our new rules</code></pre>
+  <p>When you run the last command, it'll ask for confirmation. Type 'y' and press Enter.</p>
+  <p>And there you have it! Your server is now set up to serve your web application to the world. Remember, this guide uses PostgreSQL for the database, PM2 for process management, and Nginx as the web server because they're widely used and reliable, but there are many other great tools out there. As you get more comfortable with server management, feel free to explore alternatives that might better suit your specific needs.</p>
+  <p>Don't worry if some of this seems complicated at first. It's normal to feel a bit overwhelmed when you're new to server management. Take it one step at a time, and don't be afraid to ask for help if you get stuck. You're doing great, and before you know it, you'll be a server pro!</p>
+
+  <h2>9. Pointing Your Domain to Your Server</h2>
+  <p>Last step! Head over to your domain provider and add these records:</p>
+  <ul>
+    <li>An A record for your root domain, pointing to your server's IP</li>
+    <li>A CNAME record for www, pointing to your root domain</li>
+  </ul>
+  <p>And there you have it! Your web app should now be live and kicking on your very own bare metal server. How cool is that? If you run into any hiccups or want to add some extra features, just give me a shout at <a href="https://x.com/nikamanish" style="color: var(--text-primary); font-weight: 500;">@nikamanish</a>. Happy coding!</p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/nginx.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/bash.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>
